@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>صحافة 360 - البوابة الإخبارية الشاملة</title>
+    <!-- Google Fonts: Cairo & Tajawal for Arabic typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800;900&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            DEFAULT: '#1a237e',
+                            dark: '#0f172a',
+                            light: '#283593'
+                        },
+                        accent: {
+                            DEFAULT: '#d32f2f',
+                            hover: '#b71c1c'
+                        },
+                        newsbg: {
+                            light: '#f8f9fa',
+                            dark: '#0f172a',
+                            cardDark: '#1e293b'
+                        }
+                    },
+                    fontFamily: {
+                        cairo: ['Cairo', 'sans-serif'],
+                        tajawal: ['Tajawal', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+        }
+        .ticker-wrap {
+            overflow: hidden;
+            white-space: nowrap;
+        }
+        .ticker-move {
+            display: inline-block;
+            animation: ticker 35s linear infinite;
+        }
+        .ticker-wrap:hover .ticker-move {
+            animation-play-state: paused;
+        }
+        @keyframes ticker {
+            0% { transform: translate3d(100%, 0, 0); }
+            100% { transform: translate3d(-100%, 0, 0); }
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        .dark ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #d32f2f;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="bg-newsbg-light dark:bg-newsbg-dark text-slate-800 dark:text-slate-100 transition-colors duration-300">
+
+    <!-- Top Breaking News Bar -->
+    <div class="bg-slate-900 text-white text-sm py-2 border-b border-slate-800 sticky top-0 z-50 shadow-md">
+        <div class="max-w-7xl mx-auto px-4 flex items-center justify-between">
+            <div class="flex items-center flex-1 overflow-hidden">
+                <span class="bg-accent text-white font-bold px-3 py-1 rounded text-xs flex items-center shrink-0 z-10 shadow">
+                    <i class="fa-solid fa-bolt mr-1 ml-1 animate-pulse"></i> عاجل
+                </span>
+                <div class="ticker-wrap w-full mr-3" id="tickerWrapper">
+                    <div class="ticker-move text-slate-200 text-xs md:text-sm" id="tickerContent">
+                        • البنك المركزي يعلن استقرار مؤشرات التضخم وتوقع نمو اقتصادي إيجابي • انطلاق فعاليات معرض القاهرة الدولي للابتكار والتكنولوجيا اليوم • فوز منتخب مصر لكرة القدم وتأهله رسمياً للنهائيات • افتتاح مشروعات طاقة تجديدية جديدة بصعيد مصر
+                    </div>
+                </div>
+            </div>
+            <div class="flex items-center space-x-3 space-x-reverse shrink-0 hidden sm:flex text-xs text-slate-400">
+                <button id="tickerToggle" class="hover:text-white transition px-2" title="إيقاف/تشغيل الشريط">
+                    <i class="fa-solid fa-pause"></i>
+                </button>
+                <span id="currentDate" class="border-r border-slate-700 pr-3">--:--</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header Section -->
+    <header class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 transition-colors">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between flex-wrap gap-4">
+            
+            <!-- Logo & Tagline -->
+            <div class="flex items-center space-x-4 space-x-reverse">
+                <button id="mobileMenuBtn" class="lg:hidden text-2xl text-slate-700 dark:text-slate-200 focus:outline-none">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <a href="#" class="flex items-center space-x-2 space-x-reverse group">
+                    <div class="bg-accent text-white w-10 h-10 rounded-lg flex items-center justify-center font-black text-xl shadow-lg group-hover:scale-105 transition">
+                        360
+                    </div>
+                    <div>
+                        <span class="text-2xl font-extrabold text-primary dark:text-blue-400 tracking-tight">صحافة</span>
+                        <span class="text-2xl font-extrabold text-accent">360</span>
+                        <p class="text-[10px] text-slate-500 dark:text-slate-400 -mt-1 font-semibold">بوابتك لإعلام حر ومستقل</p>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Global Search & Weather/Theme Toggle -->
+            <div class="flex items-center space-x-3 space-x-reverse flex-1 max-w-md justify-end">
+                <div class="relative w-full max-w-xs hidden md:block">
+                    <input type="text" id="searchInput" placeholder="ابحث في الأخبار..." 
+                           class="w-full bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-100 px-4 py-2 pr-10 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-accent border border-transparent dark:border-slate-700 transition">
+                    <i class="fa-solid fa-magnifying-glass absolute right-3 top-2.5 text-slate-400"></i>
+                </div>
+
+                <!-- Theme Toggle Button -->
+                <button id="themeToggle" class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-amber-400 flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-700 transition shadow-sm">
+                    <i class="fa-solid fa-moon dark:hidden"></i>
+                    <i class="fa-solid fa-sun hidden dark:block"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Desktop Navigation Bar -->
+        <nav class="border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 hidden lg:block">
+            <div class="max-w-7xl mx-auto px-4 flex items-center justify-between">
+                <ul class="flex items-center space-x-1 space-x-reverse font-bold text-sm text-slate-700 dark:text-slate-200" id="mainNav">
+                    <li><button data-category="all" class="nav-btn active px-4 py-3 hover:text-accent transition border-b-2 border-accent text-accent">الرئيسية</button></li>
+                    <li><button data-category="egypt" class="nav-btn px-4 py-3 hover:text-accent transition border-b-2 border-transparent">أخبار مصر</button></li>
+                    <li><button data-category="economy" class="nav-btn px-4 py-3 hover:text-accent transition border-b-2 border-transparent">اقتصاد</button></li>
+                    <li><button data-category="tech" class="nav-btn px-4 py-3 hover:text-accent transition border-b-2 border-transparent">تكنولوجيا</button></li>
+                    <li><button data-category="sports" class="nav-btn px-4 py-3 hover:text-accent transition border-b-2 border-transparent">رياضة</button></li>
+                    <li><button data-category="culture" class="nav-btn px-4 py-3 hover:text-accent transition border-b-2 border-transparent">ثقافة وفنون</button></li>
+                    <li><button data-category="opinion" class="nav-btn px-4 py-3 hover:text-accent transition border-b-2 border-transparent">رأي وتحليلات</button></li>
+                </ul>
+                <div class="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-2">
+                    <i class="fa-solid fa-cloud-sun text-amber-500 text-base"></i>
+                    <span>القاهرة: 28°C</span>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Mobile Navigation Drawer -->
+        <div id="mobileDrawer" class="hidden lg:hidden bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 p-4 transition-all">
+            <div class="mb-4">
+                <input type="text" id="mobileSearchInput" placeholder="ابحث في الأخبار..." 
+                       class="w-full bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-100 px-4 py-2 rounded-lg text-sm focus:outline-none border border-slate-200 dark:border-slate-700">
+            </div>
+            <ul class="space-y-2 font-bold text-slate-700 dark:text-slate-200" id="mobileNav">
+                <li><button data-category="all" class="mobile-nav-btn w-full text-right px-3 py-2 rounded hover:bg-slate-100 dark:hover:bg-slate-800">الرئيسية</button></li>
+                <li><button data-category="egypt" class="mobile-nav-btn w-full text-right px-3 py-2 rounded hover:bg-slate-100 dark:hover:bg-slate-800">أخبار مصر</button></li>
+                <li><button data-category="economy" class="mobile-nav-btn w-full text-right px-3 py-2 rounded hover:bg-slate-100 dark:hover:bg-slate-800">اقتصاد</button></li>
+                <li><button data-category="tech" class="mobile-nav-btn w-full text-right px-3 py-2 rounded hover:bg-slate-100 dark:hover:bg-slate-800">تكنولوجيا</button></li>
+                <li><button data-category="sports" class="mobile-nav-btn w-full text-right px-3 py-2 rounded hover:bg-slate-100 dark:hover:bg-slate-800">رياضة</button></li>
+                <li><button data-category="culture" class="mobile-nav-btn w-full text-right px-3 py-2 rounded hover:bg-slate-100 dark:hover:bg-slate-800">ثقافة وفنون</button></li>
+                <li><button data-category="opinion" class="mobile-nav-btn w-full text-right px-3 py-2 rounded hover:bg-slate-100 dark:hover:bg-slate-800">رأي وتحليلات</button></li>
+            </ul>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 py-6">
+        
+        <!-- Hero Section: Featured Story & Trending Column -->
+        <section class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-10">
+            
+            <!-- Main Featured News (Big Card) -->
+            <div class="lg:col-span-8 bg-white dark:bg-newsbg-cardDark rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden flex flex-col cursor-pointer group" onclick="openArticleModal(1)">
+                <div class="relative h-80 sm:h-96 overflow-hidden">
+                    <img src="https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&w=1200&q=80" 
+                         alt="خبر رئيسي" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent"></div>
+                    <span class="absolute top-4 right-4 bg-accent text-white text-xs font-extrabold px-3 py-1 rounded-full uppercase tracking-wider">
+                        خبر رئيسي
+                    </span>
+                    <div class="absolute bottom-6 right-6 left-6 text-white">
+                        <span class="text-amber-400 font-bold text-xs uppercase mb-2 inline-block">تكنولوجيا واقتصاد</span>
+                        <h1 class="text-2xl sm:text-3xl font-extrabold leading-tight mb-3 group-hover:text-amber-300 transition">
+                            مصر تطلق رسمياً أحدث مركز للذكاء الاصطناعي وابتكارات البرمجة بالشرق الأوسط
+                        </h1>
+                        <div class="flex items-center text-xs text-slate-300 space-x-4 space-x-reverse font-medium">
+                            <span><i class="fa-regular fa-user ml-1"></i> د. أحمد كمال</span>
+                            <span><i class="fa-regular fa-clock ml-1"></i> منذ ساعة واحدة</span>
+                            <span><i class="fa-regular fa-eye ml-1"></i> 14.2k مشاهدة</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-5 text-slate-600 dark:text-slate-300 text-sm leading-relaxed">
+                    افتتحت وزارة الاتصالات وتكنولوجيا المعلومات اليوم المركز القومي للذكاء الاصطناعي والحوسبة الفائقة، والذي يهدف لدعم الشباب والمبتكرين في تقنيات المستقبل وتقديم خدمات الاستضافة الرقمية للمؤسسات الناشئة...
+                </div>
+            </div>
+
+            <!-- Top Trending / Urgent List (Side Widget) -->
+            <div class="lg:col-span-4 bg-white dark:bg-newsbg-cardDark rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 p-5 flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 mb-4">
+                        <h2 class="font-extrabold text-lg flex items-center text-primary dark:text-blue-400">
+                            <i class="fa-solid fa-fire text-accent ml-2"></i> الأكثر قراءة الآن
+                        </h2>
+                        <span class="text-xs text-slate-400 font-semibold">تحديث مباشر</span>
+                    </div>
+                    
+                    <div class="space-y-4" id="trendingNewsContainer">
+                        <!-- Items rendered via JS -->
+                    </div>
+                </div>
+
+                <!-- Quick Weather / Ad Widget -->
+                <div class="mt-6 bg-slate-50 dark:bg-slate-800/60 p-4 rounded-xl border border-slate-200/60 dark:border-slate-700 text-center">
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mb-1">خدمات صحافة 360</p>
+                    <p class="font-bold text-sm text-slate-800 dark:text-slate-200">اشترك الآن في خدمة التنبيهات العاجلة عبر واتساب</p>
+                    <button onclick="alert('تم تفعيل خدمة التنبيهات بنجاح!')" class="mt-3 w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 rounded-lg text-xs transition shadow-sm flex items-center justify-center">
+                        <i class="fa-brands fa-whatsapp text-base ml-2"></i> تفعيل التنبيهات المجانية
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Filter Bar & News Feed Section -->
+        <section class="mb-12">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 pb-2 border-b border-slate-200 dark:border-slate-800">
+                <div class="flex items-center space-x-3 space-x-reverse">
+                    <h2 class="text-2xl font-black text-slate-800 dark:text-slate-100" id="sectionTitle">
+                        أحدث الأخبار والتقارير
+                    </h2>
+                    <span id="newsCountBadge" class="bg-primary/10 text-primary dark:bg-blue-900/40 dark:text-blue-300 text-xs font-bold px-2.5 py-1 rounded-full">
+                        8 أخبار
+                    </span>
+                </div>
+
+                <!-- Sub-filters / Sorting -->
+                <div class="flex items-center space-x-2 space-x-reverse text-xs">
+                    <span class="text-slate-500 font-bold">ترتيب حسب:</span>
+                    <button class="px-3 py-1.5 rounded-lg bg-primary text-white font-semibold">الأحدث</button>
+                    <button class="px-3 py-1.5 rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold hover:bg-slate-300 transition">الأكثر تفاعلاً</button>
+                </div>
+            </div>
+
+            <!-- News Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="newsGrid">
+                <!-- Rendered Dynamically via Javascript -->
+            </div>
+        </section>
+
+        <!-- Opinion & Guest Articles Section -->
+        <section class="mb-12 bg-slate-900 text-white rounded-3xl p-6 sm:p-8 shadow-xl relative overflow-hidden">
+            <div class="absolute -left-10 -bottom-10 w-48 h-48 bg-accent/20 rounded-full blur-3xl pointer-events-none"></div>
+            
+            <div class="flex items-center justify-between mb-8">
+                <div>
+                    <span class="text-accent text-xs font-bold uppercase tracking-wider">منبر الكُتّاب</span>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold mt-1">رأي وشفافية</h2>
+                </div>
+                <a href="#" class="text-xs font-bold text-slate-300 hover:text-white underline">عرض كل المقالات</a>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-slate-800/80 border border-slate-700 p-5 rounded-2xl flex flex-col justify-between hover:border-slate-500 transition">
+                    <div>
+                        <div class="flex items-center space-x-3 space-x-reverse mb-4">
+                            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80" class="w-12 h-12 rounded-full object-cover border-2 border-accent" alt="كاتب">
+                            <div>
+                                <h4 class="font-bold text-sm">أ.د. لمياء الشريف</h4>
+                                <p class="text-xs text-slate-400">محللة اقتصادية</p>
+                            </div>
+                        </div>
+                        <h3 class="font-bold text-base mb-2 text-amber-300 leading-snug">"تحولات الاقتصاد الرقمي وفرص النمو للشركات العربية الناشئة"</h3>
+                        <p class="text-xs text-slate-300 leading-relaxed line-clamp-3">إن الاستثمار في تطوير الكوادر الرقمية لم يعد خياراً ثانوياً للبلدان العربية، بل هو ركيزة الأمان الاقتصادي القادمة...</p>
+                    </div>
+                    <span class="text-[10px] text-slate-400 mt-4 block">وقت القراءة: 4 دقائق</span>
+                </div>
+
+                <div class="bg-slate-800/80 border border-slate-700 p-5 rounded-2xl flex flex-col justify-between hover:border-slate-500 transition">
+                    <div>
+                        <div class="flex items-center space-x-3 space-x-reverse mb-4">
+                            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80" class="w-12 h-12 rounded-full object-cover border-2 border-blue-500" alt="كاتب">
+                            <div>
+                                <h4 class="font-bold text-sm">م. طارق عبد العزيز</h4>
+                                <p class="text-xs text-slate-400">خبير الأمن السيبراني</p>
+                            </div>
+                        </div>
+                        <h3 class="font-bold text-base mb-2 text-amber-300 leading-snug">"حماية البيانات الشخيصة في عصر الذكاء الاصطناعي التوليدي"</h3>
+                        <p class="text-xs text-slate-300 leading-relaxed line-clamp-3">نواجه اليوم تحديات حقيقية تشمل التزييف العميق واختراق البيانات الذكية، مما يستوجب قوانين تشريعية صلبة...</p>
+                    </div>
+                    <span class="text-[10px] text-slate-400 mt-4 block">وقت القراءة: 6 دقائق</span>
+                </div>
+
+                <div class="bg-slate-800/80 border border-slate-700 p-5 rounded-2xl flex flex-col justify-between hover:border-slate-500 transition">
+                    <div>
+                        <div class="flex items-center space-x-3 space-x-reverse mb-4">
+                            <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=150&q=80" class="w-12 h-12 rounded-full object-cover border-2 border-emerald-500" alt="كاتب">
+                            <div>
+                                <h4 class="font-bold text-sm">د. ياسر المنصوري</h4>
+                                <p class="text-xs text-slate-400">باحث في العلوم السياسية</p>
+                            </div>
+                        </div>
+                        <h3 class="font-bold text-base mb-2 text-amber-300 leading-snug">"مستقبل العلاقات الدولية في ظل التكتلات الاقتصادية الجديدة"</h3>
+                        <p class="text-xs text-slate-300 leading-relaxed line-clamp-3">تغيرات الخريطة العالمية تشير إلى ظهور أقطاب جديدة تعيد رسم خطوط التجارة والطاقة في الشرق الأوسط...</p>
+                    </div>
+                    <span class="text-[10px] text-slate-400 mt-4 block">وقت القراءة: 5 دقائق</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Newsletter Signup Section -->
+        <section class="bg-gradient-to-r from-primary to-primary-light text-white rounded-2xl p-8 mb-12 text-center relative overflow-hidden shadow-lg">
+            <div class="max-w-2xl mx-auto relative z-10">
+                <i class="fa-regular fa-paper-plane text-4xl mb-3 text-amber-400"></i>
+                <h2 class="text-2xl sm:text-3xl font-extrabold mb-2">لا تفوّت أي خبر مهم!</h2>
+                <p class="text-slate-200 text-sm mb-6">اشترك في النشرة البريدية اليومية لصحافة 360 واستلم أهم الأخبار والتحليلات مباشرة في بريدك الإلكتروني.</p>
+                <form onsubmit="event.preventDefault(); alert('شكراً لاشتراكك في النشرة البريدية!');" class="flex flex-col sm:flex-row gap-3 max-w-lg mx-auto">
+                    <input type="email" placeholder="أدخل بريدك الإلكتروني..." required 
+                           class="flex-1 px-5 py-3 rounded-xl text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-accent">
+                    <button type="submit" class="bg-accent hover:bg-accent-hover text-white font-bold px-6 py-3 rounded-xl text-sm transition shadow-md">
+                        اشتراك الآن
+                    </button>
+                </form>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-400 border-t border-slate-800 text-sm pt-12 pb-6">
+        <div class="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
+            <!-- Brand Info -->
+            <div class="space-y-4">
+                <div class="flex items-center space-x-2 space-x-reverse">
+                    <div class="bg-accent text-white w-9 h-9 rounded-lg flex items-center justify-center font-black text-lg">360</div>
+                    <span class="text-xl font-extrabold text-white">صحافة 360</span>
+                </div>
+                <p class="text-xs leading-relaxed text-slate-400">
+                    مؤسسة إخبارية مستقلة تقدم تغطية شاملة وحصرية للأخبار المحلية والعالمية بكل حيادية وموضوعية على مدار 24 ساعة.
+                </p>
+                <div class="flex space-x-3 space-x-reverse text-slate-300">
+                    <a href="#" class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center hover:bg-accent hover:text-white transition"><i class="fa-brands fa-facebook-f"></i></a>
+                    <a href="#" class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center hover:bg-accent hover:text-white transition"><i class="fa-brands fa-x-twitter"></i></a>
+                    <a href="#" class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center hover:bg-accent hover:text-white transition"><i class="fa-brands fa-youtube"></i></a>
+                    <a href="#" class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center hover:bg-accent hover:text-white transition"><i class="fa-brands fa-telegram"></i></a>
+                </div>
+            </div>
+
+            <!-- Quick Links -->
+            <div>
+                <h3 class="text-white font-bold mb-4 text-base border-r-2 border-accent pr-2">الأقسام الرئيسية</h3>
+                <ul class="space-y-2 text-xs">
+                    <li><a href="#" class="hover:text-white transition">أخبار مصر والعالم العربي</a></li>
+                    <li><a href="#" class="hover:text-white transition">الأسواق والمال والأعمال</a></li>
+                    <li><a href="#" class="hover:text-white transition">تكنولوجيا وعلوم الحديثة</a></li>
+                    <li><a href="#" class="hover:text-white transition">الرياضة المحلية والدولية</a></li>
+                    <li><a href="#" class="hover:text-white transition">سيارات ومحركات</a></li>
+                </ul>
+            </div>
+
+            <!-- Policy & Terms -->
+            <div>
+                <h3 class="text-white font-bold mb-4 text-base border-r-2 border-accent pr-2">معلومات وسياسات</h3>
+                <ul class="space-y-2 text-xs">
+                    <li><a href="#" class="hover:text-white transition">من نحن</a></li>
+                    <li><a href="#" class="hover:text-white transition">فريق التحرير والمراسلون</a></li>
+                    <li><a href="#" class="hover:text-white transition">سياسة الخصوصية</a></li>
+                    <li><a href="#" class="hover:text-white transition">شروط الاستخدام</a></li>
+                    <li><a href="#" class="hover:text-white transition">أعلن معنا / خدمات النشر</a></li>
+                </ul>
+            </div>
+
+            <!-- Contact & App Info -->
+            <div>
+                <h3 class="text-white font-bold mb-4 text-base border-r-2 border-accent pr-2">اتصل بنا</h3>
+                <p class="text-xs mb-2"><i class="fa-solid fa-location-dot ml-2 text-accent"></i> القاهرة، جمهورية مصر العربية</p>
+                <p class="text-xs mb-2"><i class="fa-solid fa-envelope ml-2 text-accent"></i> contact@sahafa360.com</p>
+                <p class="text-xs mb-4"><i class="fa-solid fa-phone ml-2 text-accent"></i> +20 2 1234 5678</p>
+                <span class="text-xs font-bold text-slate-300 block mb-2">تطبيق الموبايل قريباً على:</span>
+                <div class="flex gap-2">
+                    <span class="bg-slate-800 text-xs px-3 py-1.5 rounded text-slate-300 flex items-center gap-1"><i class="fa-brands fa-google-play"></i> Google Play</span>
+                    <span class="bg-slate-800 text-xs px-3 py-1.5 rounded text-slate-300 flex items-center gap-1"><i class="fa-brands fa-apple"></i> App Store</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="max-w-7xl mx-auto px-4 border-t border-slate-800 pt-6 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500">
+            <p>© 2026 صحافة 360. جميع الحقوق محفوظة.</p>
+            <p>صُمم وتطوّر لتقديم تجربة إخبارية رقمية فريدة.</p>
+        </div>
+    </footer>
+
+    <!-- Interactive Article Detail View Modal -->
+    <div id="articleModal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white dark:bg-slate-900 w-full max-w-3xl rounded-2xl shadow-2xl overflow-hidden my-8 max-h-[90vh] flex flex-col">
+            <!-- Modal Header -->
+            <div class="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-800/50">
+                <span id="modalCategory" class="bg-accent text-white text-xs font-bold px-3 py-1 rounded-full">تصنيف الخبر</span>
+                <button onclick="closeArticleModal()" class="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-slate-300 transition">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Modal Content (Scrollable) -->
+            <div class="p-6 overflow-y-auto space-y-4 text-slate-800 dark:text-slate-200">
+                <h1 id="modalTitle" class="text-2xl sm:text-3xl font-black leading-snug">عنوان الخبر التفصيلي</h1>
+                <div class="flex items-center text-xs text-slate-500 dark:text-slate-400 space-x-4 space-x-reverse pb-4 border-b border-slate-100 dark:border-slate-800">
+                    <span id="modalAuthor"><i class="fa-regular fa-user ml-1"></i> المحرر</span>
+                    <span id="modalTime"><i class="fa-regular fa-clock ml-1"></i> التوقيت</span>
+                    <span><i class="fa-solid fa-check-double text-emerald-500 ml-1"></i> موثق</span>
+                </div>
+
+                <div class="h-64 sm:h-80 rounded-xl overflow-hidden my-4">
+                    <img id="modalImage" src="" alt="صورة الخبر" class="w-full h-full object-cover">
+                </div>
+
+                <div id="modalBody" class="text-base leading-relaxed space-y-4">
+                    <!-- Dynamic Body Text -->
+                </div>
+
+                <!-- Comments Interactive Section -->
+                <div class="mt-8 pt-6 border-t border-slate-200 dark:border-slate-800">
+                    <h3 class="font-extrabold text-lg mb-4 flex items-center">
+                        <i class="fa-regular fa-comments ml-2 text-accent"></i> التعليقات والتفاعل
+                    </h3>
+                    
+                    <!-- Comments List -->
+                    <div id="commentsList" class="space-y-3 mb-4">
+                        <div class="bg-slate-100 dark:bg-slate-800 p-3 rounded-lg text-xs">
+                            <span class="font-bold text-primary dark:text-blue-400">محمد علي:</span>
+                            <p class="text-slate-600 dark:text-slate-300 mt-1">تغطية متميزة وتقرير شامل جداً، شكراً لفريق التحرير!</p>
+                        </div>
+                    </div>
+
+                    <!-- Add Comment Form -->
+                    <form onsubmit="handleAddComment(event)" class="flex gap-2">
+                        <input type="text" id="commentInput" placeholder="أضف تعليقك هنا..." required 
+                               class="flex-1 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent">
+                        <button type="submit" class="bg-primary text-white text-xs font-bold px-4 py-2 rounded-lg hover:bg-primary-light transition">
+                            نشر
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data Store for News Articles
+        const newsArticles = [
+            {
+                id: 1,
+                category: 'tech',
+                categoryName: 'تكنولوجيا',
+                title: 'مصر تطلق رسمياً أحدث مركز للذكاء الاصطناعي وابتكارات البرمجة بالشرق الأوسط',
+                summary: 'افتتحت وزارة الاتصالات وتكنولوجيا المعلومات المركز القومي للحوسبة الفائقة لدعم الشركات الناشئة وتطوير حلول الذكاء الاصطناعي.',
+                image: 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&w=800&q=80',
+                author: 'د. أحمد كمال',
+                time: 'منذ ساعة واحدة',
+                content: `في خطوة استراتيجية نحو التحول الرقمي الشامل، أعلنت السلطات المصرية رسمياً تدشين المجمع الإقليمي للذكاء الاصطناعي والتكنولوجيا الحيوية.<br><br>
+                يستهدف المركز تدريب أكثر من 50 ألف مهندس ومطور سنوياً، وتوفير خوادم فائقة السرعة للمؤسسات الأكاديمية والبحثية للنهوض بابتكارات المستقبل.`
+            },
+            {
+                id: 2,
+                category: 'economy',
+                categoryName: 'اقتصاد',
+                title: 'صندوق النقد يرفع توقعات نمو الاقتصاد المصري والعربي لعام 2026',
+                summary: 'أفاد التقرير الأخير لصندوق النقد الدولي بتحسن ملحوظ في معدلات التضخم وزيادة تدفقات الاستثمار الأجنبي المباشر.',
+                image: 'https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?auto=format&fit=crop&w=800&q=80',
+                author: 'سارة طارق',
+                time: 'منذ ساعتين',
+                content: `سجلت المؤشرات الاقتصادية نمواً متصاعداً بفضل زيادة الصادرات وتطور المشروعات القومية والبنية التحتية.<br><br>وأشار الخبراء إلى أن استقرار أسعار الصرف أسهم بشكل مباشر في تشجيع رؤوس الأموال العربية والأجنبية على ضخ استثمارات طويلة الأجل.`
+            },
+            {
+                id: 3,
+                category: 'egypt',
+                categoryName: 'أخبار مصر',
+                title: 'تطوير القطار الكهربائي السريع وإضافة خطوط جديدة تربط المحافظات',
+                summary: 'وزارة النقل تتفقد سير العمل في مشروع شبكة القطارات السريعة لربط البحر الأحمر بالبحر المتوسط.',
+                image: 'https://images.unsplash.com/photo-1515165562839-538804960eb0?auto=format&fit=crop&w=800&q=80',
+                author: 'محمود حسن',
+                time: 'منذ 3 ساعات',
+                content: `تواصل الأطقم الفنية والهندسية العمل على تنفيذ المرحلة الثانية من مشروعات النقل الخضراء المستدامة.<br><br>يستهدف المشروع تقليل زمن الرحلات بين المحافظات بنسبة 50% وتوفير وسيلة نقل صديقة للبيئة.`
+            },
+            {
+                id: 4,
+                category: 'sports',
+                categoryName: 'رياضة',
+                title: 'المنتخب الوطني يتأهل للدور النهائي بعد مباراة ملحمية أمام منافسه التقليدي',
+                summary: 'فوز مستحق بثنائية نظيفة وسط حضور جماهيري غفير ودعم واسع من وسائل الإعلام الرياضية.',
+                image: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=800&q=80',
+                author: 'كريم سعيد',
+                time: 'منذ 4 ساعات',
+                content: `قدم الفريق أداءً تكتيكياً عالياً وتمكن من حسم بطاقة التأهل بعد تسجيل هدفين في الشوط الثاني.<br><br>وعبّر المدير الفني عن سعادته البالغة بهذا الإنجاز مشيداً بروح اللاعبين والانضباط داخل الملعب.`
+            },
+            {
+                id: 5,
+                category: 'culture',
+                categoryName: 'ثقافة وفنون',
+                title: 'افتتاح مهرجان القاهرة السينمائي الدولي بمشاركة أكثر من 40 دولة',
+                summary: 'انطلقت الدورة الجديدة بحضور نخبة من نجوم الفن وصناع السينما العرب والأجانب لتكريم الرواد.',
+                image: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=800&q=80',
+                author: 'ندى الشريف',
+                time: 'منذ 5 ساعات',
+                content: `شهدت السجادة الحمراء توافد المئات من كبار المخرجين والفنانين مع التعهُّد بدعم السينما المستقلة والمبادرات الشبابية الجديدة.`
+            },
+            {
+                id: 6,
+                category: 'tech',
+                categoryName: 'تكنولوجيا',
+                title: 'إطلاق أول تطبيق عربي معتمد للترجمة الفورية باستخدام الذكاء الاصطناعي',
+                summary: 'فريق بحثي نجح في تطوير نموذج لغوي متقدم يفهم جميع اللهجات العربية المحلية ويوفر ترجمة دقيقة.',
+                image: 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=80',
+                author: 'د. أحمد كمال',
+                time: 'منذ 6 ساعات',
+                content: `يتميز النماذج الجديد بقدرته على التمييز بين المصطلحات القانونية والطبية واليومية مع توفير خدمات الاستماع والتحويل النصي الفوري.`
+            },
+            {
+                id: 7,
+                category: 'opinion',
+                categoryName: 'رأي وتحليلات',
+                title: 'مستقبل الأمن الغذائي والمائي في أفريقيا: التحديات والحلول الذكية',
+                summary: 'قراءة تحليليّة في الشراكات الإقليمية الحديثة والحلول التكنولوجية المستدامة لضمان الأمن الغذائي.',
+                image: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=800&q=80',
+                author: 'د. إبراهيم العوضي',
+                time: 'منذ 8 ساعات',
+                content: `التعاون العابر للحدود وتطوير نظم الري الحديثة هما المخرج الوحيد لمواجهة التغيرات المناخية المتسارعة.`
+            },
+            {
+                id: 8,
+                category: 'economy',
+                categoryName: 'اقتصاد',
+                title: 'ارتفاع قياسي في حجم التبادل التجاري الرقمي بين الدول العربية',
+                summary: 'التقارير الاقتصادية تؤكد زيادة الشحن والتجارة الإلكترونية بنسبة 35% مقارنة بالعام الماضي.',
+                image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=80',
+                author: 'سارة طارق',
+                time: 'منذ 10 ساعات',
+                content: `ساهمت المنصات الرقمية الحديثة وسهولة الدفع الإلكتروني في تسريع عمليات الشحن والتبادل بين الشركات المستوردة والمصدرة.`
+            }
+        ];
+
+        let currentCategory = 'all';
+        let currentSearchQuery = '';
+
+        // Render News Grid items
+        function renderNewsGrid() {
+            const grid = document.getElementById('newsGrid');
+            grid.innerHTML = '';
+
+            const filtered = newsArticles.filter(item => {
+                const matchesCategory = currentCategory === 'all' || item.category === currentCategory;
+                const matchesSearch = item.title.includes(currentSearchQuery) || item.summary.includes(currentSearchQuery);
+                return matchesCategory && matchesSearch;
+            });
+
+            document.getElementById('newsCountBadge').textContent = `${filtered.length} أخبار`;
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full text-center py-12 text-slate-500">
+                        <i class="fa-regular fa-folder-open text-4xl mb-3"></i>
+                        <p class="font-bold">لا توجد أخبار مطابقة لبحثك أو تصنيفك حالياً.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            filtered.forEach(article => {
+                const card = document.createElement('div');
+                card.className = 'bg-white dark:bg-newsbg-cardDark rounded-xl overflow-hidden shadow-sm border border-slate-100 dark:border-slate-800 flex flex-col justify-between hover:shadow-md transition duration-300 group cursor-pointer';
+                card.onclick = () => openArticleModal(article.id);
+
+                card.innerHTML = `
+                    <div>
+                        <div class="relative h-48 overflow-hidden">
+                            <img src="${article.image}" alt="${article.title}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                            <span class="absolute top-3 right-3 bg-primary/90 text-white text-[10px] font-bold px-2.5 py-1 rounded-md">
+                                ${article.categoryName}
+                            </span>
+                        </div>
+                        <div class="p-4">
+                            <h3 class="font-bold text-base text-slate-800 dark:text-slate-100 mb-2 group-hover:text-accent transition line-clamp-2">
+                                ${article.title}
+                            </h3>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed line-clamp-3 mb-3">
+                                ${article.summary}
+                            </p>
+                        </div>
+                    </div>
+                    <div class="px-4 pb-4 pt-2 border-t border-slate-50 dark:border-slate-800/60 flex items-center justify-between text-[11px] text-slate-400 font-medium">
+                        <span><i class="fa-regular fa-user ml-1"></i> ${article.author}</span>
+                        <span><i class="fa-regular fa-clock ml-1"></i> ${article.time}</span>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // Render Trending Sidebar Items
+        function renderTrendingList() {
+            const container = document.getElementById('trendingNewsContainer');
+            const trending = newsArticles.slice(0, 4);
+
+            container.innerHTML = trending.map((item, index) => `
+                <div onclick="openArticleModal(${item.id})" class="flex items-start space-x-3 space-x-reverse cursor-pointer group pb-3 border-b border-slate-100 dark:border-slate-800/60 last:border-none">
+                    <span class="text-2xl font-black text-slate-300 dark:text-slate-700 group-hover:text-accent transition w-6 text-center">
+                        ${index + 1}
+                    </span>
+                    <div class="flex-1">
+                        <span class="text-[10px] font-bold text-accent">${item.categoryName}</span>
+                        <h3 class="text-xs font-bold text-slate-700 dark:text-slate-200 group-hover:text-primary dark:group-hover:text-blue-400 transition leading-snug line-clamp-2">
+                            ${item.title}
+                        </h3>
+                        <span class="text-[10px] text-slate-400 mt-1 block">${item.time}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Modal Functionality
+        function openArticleModal(id) {
+            const article = newsArticles.find(a => a.id === id) || newsArticles[0];
+            document.getElementById('modalCategory').textContent = article.categoryName;
+            document.getElementById('modalTitle').textContent = article.title;
+            document.getElementById('modalAuthor').innerHTML = `<i class="fa-regular fa-user ml-1"></i> ${article.author}`;
+            document.getElementById('modalTime').innerHTML = `<i class="fa-regular fa-clock ml-1"></i> ${article.time}`;
+            document.getElementById('modalImage').src = article.image;
+            document.getElementById('modalBody').innerHTML = article.content || article.summary;
+
+            document.getElementById('articleModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeArticleModal() {
+            document.getElementById('articleModal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        function handleAddComment(e) {
+            e.preventDefault();
+            const input = document.getElementById('commentInput');
+            const text = input.value.trim();
+            if (!text) return;
+
+            const commentsList = document.getElementById('commentsList');
+            const newComment = document.createElement('div');
+            newComment.className = 'bg-slate-100 dark:bg-slate-800 p-3 rounded-lg text-xs animate-fade-in';
+            newComment.innerHTML = `
+                <span class="font-bold text-accent">زائر جديد:</span>
+                <p class="text-slate-600 dark:text-slate-300 mt-1">${text}</p>
+            `;
+            commentsList.appendChild(newComment);
+            input.value = '';
+        }
+
+        // Setup Event Listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            // Clock Initialization
+            setInterval(() => {
+                const now = new Date();
+                const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+                document.getElementById('currentDate').textContent = now.toLocaleDateString('ar-EG', options);
+            }, 1000);
+
+            // Dark Mode Toggle
+            const themeBtn = document.getElementById('themeToggle');
+            themeBtn.addEventListener('click', () => {
+                document.documentElement.classList.toggle('dark');
+            });
+
+            // Mobile Navigation Toggle
+            const mobileBtn = document.getElementById('mobileMenuBtn');
+            const mobileDrawer = document.getElementById('mobileDrawer');
+            mobileBtn.addEventListener('click', () => {
+                mobileDrawer.classList.toggle('hidden');
+            });
+
+            // Ticker Play/Pause Toggle
+            const tickerWrapper = document.getElementById('tickerWrapper');
+            const tickerToggle = document.getElementById('tickerToggle');
+            let isPaused = false;
+            tickerToggle.addEventListener('click', () => {
+                isPaused = !isPaused;
+                tickerWrapper.querySelector('.ticker-move').style.animationPlayState = isPaused ? 'paused' : 'running';
+                tickerToggle.innerHTML = isPaused ? '<i class="fa-solid fa-play"></i>' : '<i class="fa-solid fa-pause"></i>';
+            });
+
+            // Filter Navigation Listeners
+            const navButtons = document.querySelectorAll('.nav-btn, .mobile-nav-btn');
+            navButtons.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const cat = e.target.getAttribute('data-category');
+                    currentCategory = cat;
+
+                    // Update Active Tab Styles
+                    document.querySelectorAll('.nav-btn').forEach(b => {
+                        b.classList.remove('border-accent', 'text-accent');
+                        b.classList.add('border-transparent');
+                    });
+                    if (e.target.classList.contains('nav-btn')) {
+                        e.target.classList.add('border-accent', 'text-accent');
+                    }
+
+                    renderNewsGrid();
+                });
+            });
+
+            // Search Filter
+            const searchInput = document.getElementById('searchInput');
+            const mobileSearchInput = document.getElementById('mobileSearchInput');
+
+            const handleSearch = (e) => {
+                currentSearchQuery = e.target.value.trim();
+                renderNewsGrid();
+            };
+
+            searchInput.addEventListener('input', handleSearch);
+            mobileSearchInput.addEventListener('input', handleSearch);
+
+            // Initial Renders
+            renderNewsGrid();
+            renderTrendingList();
+        });
+    </script>
+</body>
+</html>
